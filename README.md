@@ -17,14 +17,41 @@
 ### Landing Page
 <img width="1068" height="807" alt="TubeIntelligence Home" src="https://github.com/user-attachments/assets/93a85b8c-cdbd-4e80-b27b-f847a3369cbe" />
 
-
 *Clean, modern interface showcasing the platform's core value proposition*
 
 ### Analysis Configuration
 <img width="1067" height="805" alt="Configure Analysis" src="https://github.com/user-attachments/assets/8d1d3d75-9d17-40fd-83bd-f051f52325cf" />
 
-
 *Select AI-powered intelligence modules for your channel audit*
+
+### AI-Powered Report Analysis
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="./screenshots/report-detail.png" alt="Semantic Title Engine Analysis" />
+      <p align="center"><em>Semantic Title Engine - AI-generated title alternatives with CTR predictions</em></p>
+    </td>
+    <td width="50%">
+      <img src="./screenshots/trend-intelligence.png" alt="Trend Intelligence Dashboard" />
+      <p align="center"><em>Trend Intelligence - 48-hour early trend detection and content ideas</em></p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <img src="./screenshots/ctr-analysis-1.png" alt="Predictive CTR Analysis - Score" />
+      <p align="center"><em>Predictive CTR Analysis - Current CTR score and industry comparison</em></p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <img src="./screenshots/ctr-analysis-2.png" alt="Predictive CTR Analysis - Recommendations" />
+      <p align="center"><em>Predictive CTR Analysis - Optimization recommendations and psychological triggers</em></p>
+    </td>
+  </tr>
+</table>
+
+
 
 ##  Overview
 
