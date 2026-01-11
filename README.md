@@ -15,11 +15,15 @@
 ## Screenshots
 
 ### Landing Page
-![TubeIntelligence Home](./screenshots/home.png)
+<img width="1068" height="807" alt="TubeIntelligence Home" src="https://github.com/user-attachments/assets/93a85b8c-cdbd-4e80-b27b-f847a3369cbe" />
+
+
 *Clean, modern interface showcasing the platform's core value proposition*
 
 ### Analysis Configuration
-![Configure Analysis](./screenshots/audit.png)
+<img width="1067" height="805" alt="Configure Analysis" src="https://github.com/user-attachments/assets/8d1d3d75-9d17-40fd-83bd-f051f52325cf" />
+
+
 *Select AI-powered intelligence modules for your channel audit*
 
 ##  Overview
