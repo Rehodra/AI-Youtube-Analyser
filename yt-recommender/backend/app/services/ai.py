@@ -137,7 +137,17 @@ Use the exact field names shown below (case-sensitive, with underscores).
 
 JSON STRUCTURE:
 {{
-  "services": {{
+    "email_summary": {{
+        "headline": "string - curiosity-driven headline (max 12 words)",
+        "teaser": "string - 2–3 lines teasing the biggest missed opportunity or upside",
+        "key_insights": [
+            "string - high-impact insight without full details",
+            "string - high-impact insight without full details",
+            "string - high-impact insight without full details"
+        ],
+        "cta": "string - compelling CTA to view full report (upgrade-oriented)"
+    }},
+    "services": {{
     "semantic_title_engine": {{
       "channel_analysis": {{
         "overall_assessment": "string - detailed channel title strategy analysis"
@@ -257,6 +267,14 @@ FIELD NAME RULES:
 - risk_level values: "LOW", "MEDIUM", or "HIGH" (uppercase)
 - Scores are numbers (not strings): 5.5, 90, 8
 - Arrays must contain strings or objects as shown above
+
+EMAIL SUMMARY RULES:
+- Do NOT reveal full recommendations
+- Tease problems, gaps, or upside
+- Make the creator curious or slightly anxious
+- Assume user has NOT seen the dashboard yet
+- Tone: confident, insightful, premium
+
 
 Remember:
 - Include ONLY requested services
@@ -395,123 +413,229 @@ def get_fallback_analysis(videos: List[Dict[str, Any]], services: List[str] = No
     
     videos_to_analyze = videos[:3] if len(videos) > 3 else videos
     services = services or []
-    
-    result = {"services": {}}
-    
-    # Add service-specific fallback data
-    if "1" in services:  # Semantic Title Engine
+
+    # Email-first teaser (used for conversion, not full insight)
+    result = {
+        "email_summary": {
+            "headline": "Your channel has untapped growth potential",
+            "teaser": (
+                "We reviewed your recent videos and identified title, CTR, "
+                "and visibility gaps that are quietly limiting reach."
+            ),
+            "key_insights": [
+                "Your titles explain content but don’t maximize curiosity",
+                "Click-through rate signals are below platform benchmarks",
+                "You’re missing short-window trends relevant to your niche"
+            ],
+            "cta": "Open your full AI report to see what to fix first →"
+        },
+        "services": {}
+    }
+
+    # ------------------------------------------------------------------
+    # Semantic Title Engine
+    # ------------------------------------------------------------------
+    if "1" in services:
         result["services"]["semantic_title_engine"] = {
-            "channelAnalysis": "Your channel consistently produces technical, in-depth content. While accurate and systematic, current titles lean towards cataloging rather than engagement. To maximize CTR, focus on benefit-driven language, curiosity gaps, and problem/solution framing instead of internal numbering systems.",
-            "videoAnalyses": [
+            "channel_analysis": {
+                "overall_assessment": (
+                    "Your channel focuses on clarity and depth, but current titles "
+                    "prioritize description over click psychology. This limits discovery "
+                    "despite strong underlying content quality."
+                )
+            },
+            "suggestions": [
                 {
-                    "originalTitle": videos_to_analyze[0].get('title', 'Video 1') if videos_to_analyze else "Video 1",
-                    "currentIssues": [
-                        "Lacks emotional hook or curiosity gap",
-                        "Too descriptive without conveying urgency or benefit",
-                        "Missing power words that drive clicks"
+                    "original_title": (
+                        videos_to_analyze[0].get("title", "Video 1")
+                        if videos_to_analyze else "Video 1"
+                    ),
+                    "current_issues": [
+                        "No strong curiosity gap or emotional trigger",
+                        "Title explains topic instead of selling outcome",
+                        "Lacks urgency or viewer-centric framing"
                     ],
-                    "alternatives": [
+                    "alternative_titles": [
                         {
-                            "title": "Stop Making This Mistake (It's Costing You Views)",
-                            "ctrPotential": 8.5,
-                            "whyEffective": "Creates urgency with 'Stop' + fear of missing out. Pattern interrupt grabs attention. Implies viewer is making mistakes they don't know about, creating curiosity gap."
+                            "new_suggested_title": "This Mistake Is Costing You Views",
+                            "ctr_potential_rating": 8,
+                            "why_it_s_effective": (
+                                "Introduces loss aversion and curiosity by implying "
+                                "the viewer is unknowingly hurting growth."
+                            )
                         },
                         {
-                            "title": "The ONE Thing Top Creators Do Differently",
-                            "ctrPotential": 8.2,
-                            "whyEffective": "Curiosity gap with 'ONE Thing' + authority positioning through 'Top Creators'. Viewer wants to know the secret ingredient. Implies actionable, focused advice."
+                            "new_suggested_title": "What Top Creators Do That You Don’t",
+                            "ctr_potential_rating": 8,
+                            "why_it_s_effective": (
+                                "Uses authority contrast to trigger comparison and intrigue."
+                            )
                         },
                         {
-                            "title": "I Tried This For 30 Days (Results Shocked Me)",
-                            "ctrPotential": 7.9,
-                            "whyEffective": "Personal story hook with specific timeframe builds credibility. 'Shocked Me' creates emotional intrigue. Viewer wants to see unexpected results."
+                            "new_suggested_title": "I Tested This for 30 Days — The Results Surprised Me",
+                            "ctr_potential_rating": 7,
+                            "why_it_s_effective": (
+                                "Time-boxed experimentation builds credibility and suspense."
+                            )
                         }
                     ]
                 }
-            ] if videos_to_analyze else [],
-            "growthTips": [
-                "Remove internal numbering from public titles - focus on benefit-driven language and curiosity gaps instead",
-                "Use power words strategically: SECRET, MASTER, NEVER, SHOCKING, PROVEN - test which resonate with your audience",
-                "Create problem/solution titles: Start with the pain point ('Stop Slow Servers') then promise the solution"
+            ],
+            "growth_tips": [
+                "Frame titles around outcomes, not topics",
+                "Use contrast words like stop, avoid, secret, or proven",
+                "Test curiosity-first titles before descriptive ones"
             ]
         }
-    
-    if "2" in services:  # Predictive CTR Analysis
+
+    # ------------------------------------------------------------------
+    # Predictive CTR Analysis
+    # ------------------------------------------------------------------
+    if "2" in services:
         result["services"]["predictive_ctr_analysis"] = {
-            "estimatedCTR": 4.2,
-            "industryAverage": 6.8,
+            "score": 4.5,
+            "reasoning": (
+                "Titles and positioning are informative but lack emotional pull, "
+                "reducing click probability compared to similar channels."
+            ),
+            "comparison_to_industry_average": (
+                "Below average CTR compared to channels in the same category."
+            ),
+            "what_is_working_or_missing": {
+                "working": (
+                    "Clear topic communication and consistent formatting."
+                ),
+                "missing": (
+                    "Emotional hooks, curiosity gaps, and visual-title alignment."
+                )
+            },
             "recommendations": [
-                "Add numbers or specific timeframes to titles (e.g., '5 Ways', 'In 10 Minutes')",
-                "Use stronger emotional triggers (SHOCKING, NEVER, ALWAYS, SECRET)",
-                "Create curiosity gaps - promise information without revealing it",
-                "Test thumbnails with faces showing strong emotions"
+                "Add numbers, timeframes, or bold claims to titles",
+                "Align thumbnails with one dominant emotion",
+                "Remove neutral wording in favor of benefit-driven phrasing"
             ],
-            "potentialIncrease": "+60% CTR with optimized titles and thumbnails"
+            "potential_increase": "30–60%",
+            "psychological_triggers_to_boost_engagement": [
+                "Curiosity gap",
+                "Fear of missing out",
+                "Authority comparison"
+            ]
         }
-    
-    if "3" in services:  # Multi-Platform Mastery
+
+    # ------------------------------------------------------------------
+    # Multi-Platform Mastery
+    # ------------------------------------------------------------------
+    if "3" in services:
         result["services"]["multi_platform_mastery"] = {
             "platforms": {
                 "youtube": {
-                    "score": 7.5,
-                    "strategy": "Continue long-form educational content. YouTube rewards watch time - aim for 8-12 minute videos.",
-                    "optimization": "Add chapters, improve retention in first 30 seconds"
+                    "score": 7,
+                    "reasoning": "Strong long-form potential, weaker initial hook.",
+                    "strategy": (
+                        "Optimize first 30 seconds for retention and title-thumbnail cohesion."
+                    ),
+                    "optimization_tips": [
+                        "Shorten intros",
+                        "Reinforce title promise immediately"
+                    ]
                 },
-                "x": {
-                    "score": 6.2,
-                    "strategy": "Create thread-style breakdowns of key insights. X rewards engagement and viral hooks in the first tweet.",
-                    "optimization": "Lead with controversial or surprising statements, use numbered threads, end with CTA"
+                "x_twitter": {
+                    "score": 6,
+                    "reasoning": "Content not adapted to fast-scroll behavior.",
+                    "strategy": (
+                        "Convert insights into sharp opinion-led threads."
+                    ),
+                    "optimization_tips": [
+                        "Lead with a bold claim",
+                        "Use numbered hooks"
+                    ]
                 },
                 "linkedin": {
-                    "score": 7.8,
-                    "strategy": "Position content as thought leadership and professional development. LinkedIn rewards authentic storytelling and industry insights.",
-                    "optimization": "Share behind-the-scenes process, lessons learned, tag relevant companies/people"
+                    "score": 7,
+                    "reasoning": "Educational tone fits platform expectations.",
+                    "strategy": (
+                        "Position content as lessons learned or frameworks."
+                    ),
+                    "optimization_tips": [
+                        "Share behind-the-scenes context",
+                        "Tie insights to professional outcomes"
+                    ]
                 }
             }
         }
-    
-    if "7" in services:  # Copyright Protection
+
+    # ------------------------------------------------------------------
+    # Copyright Protection
+    # ------------------------------------------------------------------
+    if "7" in services:
         result["services"]["copyright_protection"] = {
-            "riskLevel": "low",
+            "risk_level": "LOW",
             "flags": [],
-            "assessment": "No obvious copyright concerns detected in titles and descriptions. Ensure any music, clips, or images used have proper licensing.",
+            "assessment": (
+                "No immediate copyright risks detected based on available metadata."
+            ),
             "recommendations": [
-                "Always use royalty-free music from YouTube Audio Library",
-                "Credit original sources when using clips or images",
-                "Keep commentary transformative if using copyrighted content"
+                "Use royalty-free music only",
+                "Avoid unlicensed third-party clips"
             ]
         }
-    
-    if "8" in services:  # Fair Use Analysis
+
+    # ------------------------------------------------------------------
+    # Fair Use Analysis
+    # ------------------------------------------------------------------
+    if "8" in services:
         result["services"]["fair_use_analysis"] = {
-            "score": 75,
-            "assessment": "Content appears educational and transformative. Likely falls under fair use if properly attributed.",
-            "factors": {
-                "purpose": "Educational/Commentary - STRONG",
-                "nature": "Factual/Informational - STRONG",
-                "amount": "Unknown - Need video review",
-                "effect": "Unlikely to harm market - MODERATE"
+            "score": 78,
+            "reasoning": (
+                "Content appears educational and sufficiently transformative."
+            ),
+            "assessment": (
+                "Likely to qualify as fair use when paired with original commentary."
+            ),
+            "fair_use_factors_breakdown": {
+                "purpose_and_character": {
+                    "score": 8,
+                    "reasoning": "Educational intent strengthens fair use."
+                },
+                "nature_of_work": {
+                    "score": 7,
+                    "reasoning": "Primarily factual material."
+                },
+                "amount_used": {
+                    "score": 6,
+                    "reasoning": "Unknown usage length — review recommended."
+                },
+                "market_effect": {
+                    "score": 8,
+                    "reasoning": "Unlikely to replace original content demand."
+                }
             },
-            "recommendation": "Maintain educational focus, add clear commentary, and provide proper attribution."
+            "recommendation_for_legal_safety": (
+                "Add explicit commentary and avoid long unaltered clips."
+            )
         }
-    
-    if "10" in services:  # Trend Intelligence
+
+    # ------------------------------------------------------------------
+    # Trend Intelligence
+    # ------------------------------------------------------------------
+    if "10" in services:
         result["services"]["trend_intelligence"] = {
-            "trendingTopics": [
-                {"topic": "AI Tools for Content Creation", "growth": "+340% in 48h", "relevance": "high"},
-                {"topic": "Productivity Hacks 2026", "growth": "+180% in 48h", "relevance": "medium"},
-                {"topic": "Algorithm Changes", "growth": "+95% in 48h", "relevance": "high"}
+            "trending_topics": [
+                {
+                    "name": "AI tools creators aren’t using yet",
+                    "growth_percentage": "120%",
+                    "relevance_rating": 9,
+                    "reasoning": "High curiosity with low current saturation."
+                }
             ],
             "predictions": [
-                "AI-assisted content creation will dominate discussions next week",
-                "Tutorial-style content with 'follow along' format trending upward",
-                "Short-form vertical videos continue to gain traction across all platforms"
+                "Actionable AI workflows will outperform generic tool lists",
+                "Short, experiment-based videos will gain momentum"
             ],
-            "recommendations": [
-                "Create content about 'AI tools you're not using yet'",
-                "Jump on trending topics within 24-48 hours for maximum visibility",
-                "Combine educational value with entertainment (edutainment)"
+            "actionable_content_ideas": [
+                "Testing one underrated AI tool live",
+                "Breaking down why most creators misuse AI"
             ]
         }
-    
+
     return result

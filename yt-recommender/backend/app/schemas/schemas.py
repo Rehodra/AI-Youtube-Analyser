@@ -16,8 +16,7 @@ class JobStatusResponse(BaseModel):
     job_id: str = Field(..., alias="jobId")
     status: str = Field(..., description="Current job status, e.g., queued, channel_resolved, videos_fetched, completed, failed")
     error: Optional[str] = None
-    channelId: Optional[str] = None
-    channelName: Optional[str] = None
+    channel_id: Optional[str] = None
     videos: Optional[List[VideoInfo]] = None
     aiReport: Optional[Dict[str, Any]] = None  # Changed from str to Dict to support structured analysis
 
@@ -188,3 +187,15 @@ class TypedAIServicesResponse(BaseModel):
     copyright_protection: Optional[CopyrightProtection] = None
     fair_use_analysis: Optional[FairUseAnalysis] = None
     trend_intelligence: Optional[TrendIntelligence] = None
+
+# ============================================================================
+# EMAIL SUMMARY SCHEMA
+# ============================================================================
+
+class EmailSummary(BaseModel):
+    headline: str = Field(..., description="Curiosity-driven headline")
+    teaser: str = Field(..., description="Short teaser to spark interest")
+    key_insights: List[str] = Field(..., min_items=2, max_items=5)
+    cta: str = Field(..., description="Call to action")
+
+

@@ -21,11 +21,15 @@ class Settings(BaseSettings):
     google_client_id: str = os.getenv("GOOGLE_CLIENT_ID", "")
     google_client_secret: str = os.getenv("GOOGLE_CLIENT_SECRET", "")
     google_redirect_uri: str = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/auth/google/callback")
+
+    #Email
+    email: str = os.getenv("EMAIL", "")
+    password: str = os.getenv("PASSWORD", "")
     
     # Application
     frontend_url: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
     environment: str = os.getenv("ENVIRONMENT", "development")
-
+    
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
