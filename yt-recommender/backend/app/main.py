@@ -35,6 +35,6 @@ app.add_middleware(
 
 
 # Routers
-app.include_router(auth.outer)
+app.include_router(auth.router)
 app.include_router(job.router)
 app.include_router(test_db.router, prefix="/api")
