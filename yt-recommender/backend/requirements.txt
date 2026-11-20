@@ -3,7 +3,7 @@ uvicorn
 motor
 pydantic[email]
 pydantic-settings
-google-genai
+groq
 bcrypt
 python-jose[cryptography]
 python-multipart

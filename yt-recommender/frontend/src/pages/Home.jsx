@@ -71,16 +71,16 @@ const Home = () => {
           <div className="flex flex-col items-center">
             <div className="flex flex-wrap justify-center gap-3">
               <Link
-                to={isLoggedIn ? '/audit' : '/register'}
+                to="/audit"
                 className="px-8 py-4 bg-slate-900 text-white font-bold text-[10px] uppercase tracking-widest rounded-xl hover:bg-sky-600 transition-all shadow-xl shadow-slate-200 active:scale-95"
               >
-                {isLoggedIn ? 'Start New Audit' : 'Onboard Organization'}
+                Start New Audit
               </Link>
               <Link
-                to={isLoggedIn ? '/reports' : '/login'}
+                to="/reports"
                 className="px-8 py-4 bg-white text-slate-900 border border-slate-200 font-bold text-[10px] uppercase tracking-widest rounded-xl hover:border-sky-500 transition-all active:scale-95"
               >
-                {isLoggedIn ? 'View Reports' : 'Perform System Audit'}
+                View Reports
               </Link>
             </div>
           </div>

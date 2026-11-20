@@ -1,7 +1,6 @@
 import json
-from google import genai
-from google.genai import types
 from typing import List, Dict, Any
+from groq import AsyncGroq
 from app.core.config import settings
 
 
@@ -18,7 +17,7 @@ SERVICE_MAP = {
 
 async def analyse(videos: List[Dict[str, Any]], channel_stats: Dict[str, Any] = None, services: List[str] = None) -> Dict[str, Any]:
     """
-    Analyze YouTube videos using Gemini-2.5-flash with service-specific analysis.
+    Analyze YouTube videos using Groq (llama-3.3-70b-versatile) with service-specific analysis.
     
     Args:
         videos: List of video dictionaries with title, description, url, statistics
@@ -28,18 +27,19 @@ async def analyse(videos: List[Dict[str, Any]], channel_stats: Dict[str, Any] = 
     Returns:
         Dictionary with service-specific analysis results
     """
-    if not settings.gemini_api_key:
+    if not settings.groq_api_key:
+        print("Groq API key not configured, using fallback analysis")
         return get_fallback_analysis(videos, services)
     
     try:
-        return await call_gemini_api(videos, channel_stats, services)
+        return await call_groq_api(videos, channel_stats, services)
     except Exception as e:
-        print(f"Gemini API failed, using fallback: {str(e)}")
+        print(f"Groq API failed, using fallback: {str(e)}")
         return get_fallback_analysis(videos, services)
 
 
-async def call_gemini_api(videos: List[Dict[str, Any]], channel_stats: Dict[str, Any] = None, services: List[str] = None) -> Dict[str, Any]:
-    """Call Gemini API with service-specific prompts."""
+async def call_groq_api(videos: List[Dict[str, Any]], channel_stats: Dict[str, Any] = None, services: List[str] = None) -> Dict[str, Any]:
+    """Call Groq API with service-specific prompts."""
     
     # Build video details for prompt (take last 3 videos)
     videos_to_analyze = videos[:3] if len(videos) > 3 else videos
@@ -282,23 +282,30 @@ Remember:
 """
 
     
-    print(f"Calling Gemini API with {len(services or [])} services... (prompt length: {len(prompt)})")
+    print(f"Calling Groq API with {len(services or [])} services... (prompt length: {len(prompt)})")
     
-    # Initialize Gemini client
-    client = genai.Client(api_key=settings.gemini_api_key)
+    # Initialize Groq client
+    client = AsyncGroq(api_key=settings.groq_api_key)
     
-    # Call Gemini API
-    response = await client.aio.models.generate_content(
-        model='gemini-2.5-flash',
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            temperature=0.7,
-            system_instruction="You are an expert YouTube content strategist. Always respond with valid JSON only."
-        )
+    # Call Groq API with fast, capable model
+    chat_completion = await client.chat.completions.create(
+        messages=[
+            {
+                "role": "system",
+                "content": "You are an expert YouTube content strategist. Always respond with valid JSON only."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        model="qwen/qwen3.8-27b",
+        temperature=0.7,
+        response_format={"type": "json_object"}
     )
     
-    response_text = response.text
-    print(f"Gemini response received (length: {len(response_text)})")
+    response_text = chat_completion.choices[0].message.content or ""
+    print(f"Groq response received (length: {len(response_text)})")
     
     # Parse JSON from response
     try:
@@ -309,7 +316,7 @@ Remember:
         return analysis_result
         
     except json.JSONDecodeError as parse_error:
-        print(f"Failed to parse Gemini response as JSON: {str(parse_error)}")
+        print(f"Failed to parse Groq response as JSON: {str(parse_error)}")
         # Return fallback
         return get_fallback_analysis(videos, services)
 
@@ -409,7 +416,7 @@ def build_service_instructions(services: List[str]) -> str:
 
 
 def get_fallback_analysis(videos: List[Dict[str, Any]], services: List[str] = None) -> Dict[str, Any]:
-    """Fallback analysis when Gemini API is unavailable."""
+    """Fallback analysis when AI API is unavailable."""
     
     videos_to_analyze = videos[:3] if len(videos) > 3 else videos
     services = services or []

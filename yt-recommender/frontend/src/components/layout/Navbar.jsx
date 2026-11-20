@@ -78,17 +78,32 @@ const Navbar = ({ isLoggedIn, user, onLogout }) => {
 
           {/* Actions */}
           <div className="flex items-center gap-4">
+            <Link
+              to="/audit"
+              className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-all shadow-sm"
+            >
+              <BarChart3 size={18} />
+              <span>Audit Channel</span>
+            </Link>
+
             {!isLoggedIn ? (
               <>
                 <Link
+                  to="/reports"
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+                >
+                  <FileText size={16} className="text-slate-400" />
+                  <span>Reports</span>
+                </Link>
+                <Link
                   to="/login"
-                  className="hidden sm:block px-5 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+                  className="hidden sm:block px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
                 >
                   Log in
                 </Link>
                 <Link
                   to="/register"
-                  className="px-5 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-all shadow-sm"
+                  className="px-4 py-2 bg-slate-100 text-slate-800 text-sm font-medium rounded-lg hover:bg-slate-200 transition-all shadow-sm"
                 >
                   Get Started
                 </Link>
@@ -103,17 +118,6 @@ const Navbar = ({ isLoggedIn, user, onLogout }) => {
                     <FileText size={18} className="text-slate-400" />
                     <span>Reports</span>
                   </Link>
-
-                  {/* Hide New Audit button on Reports page */}
-                  {location.pathname !== '/reports' && (
-                    <Link
-                      to="/audit"
-                      className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-all shadow-sm"
-                    >
-                      <BarChart3 size={18} />
-                      <span>New Audit</span>
-                    </Link>
-                  )}
                 </div>
 
                 {/* Profile Dropdown */}

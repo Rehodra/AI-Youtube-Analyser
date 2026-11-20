@@ -2,8 +2,6 @@ from fastapi import APIRouter, HTTPException, status, Depends, UploadFile, File
 from fastapi.responses import RedirectResponse
 from datetime import datetime
 from typing import Optional
-from authlib.integrations.starlette_client import OAuth
-from starlette.requests import Request
 
 from app.schemas.schemas import UserRegister, UserLogin, TokenResponse, UserResponse, ProfileUpdate, PlanUpdate
 from app.utils.auth import hash_password, verify_password, create_jwt, get_current_user
@@ -12,16 +10,6 @@ from app.services.cloudinary_service import upload_avatar, delete_avatar
 from app.core.config import settings
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
-
-# OAuth setup
-oauth = OAuth()
-oauth.register(
-    name='google',
-    client_id=settings.google_client_id,
-    client_secret=settings.google_client_secret,
-    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
-    client_kwargs={'scope': 'openid email profile'}
-)
 
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
@@ -383,88 +371,3 @@ async def delete_account(user: dict = Depends(get_current_user)):
         )
     
     return None
-
-
-@router.get("/google")
-async def google_login(request: Request):
-    """
-    Redirect to Google OAuth consent screen
-    """
-    redirect_uri = settings.google_redirect_uri
-    return await oauth.google.authorize_redirect(request, redirect_uri)
-
-
-@router.get("/google/callback")
-async def google_callback(request: Request):
-    """
-    Handle Google OAuth callback
-    """
-    try:
-        # Get token from Google
-        token = await oauth.google.authorize_access_token(request)
-        user_info = token.get('userinfo')
-        
-        if not user_info:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Failed to get user info from Google"
-            )
-        
-        email = user_info.get('email')
-        google_id = user_info.get('sub')
-        full_name = user_info.get('name')
-        avatar_url = user_info.get('picture')
-        
-        # Check if user exists
-        user = await mongo_client.get_user_by_email(email)
-        
-        if user:
-            # User exists - login
-            user_id = user["_id"]
-        else:
-            # Create new user
-            # Generate username from email
-            username = email.split('@')[0]
-            
-            # Ensure username is unique
-            counter = 1
-            original_username = username
-            while await mongo_client.get_user_by_username(username):
-                username = f"{original_username}{counter}"
-                counter += 1
-            
-            user_doc = {
-                "email": email,
-                "username": username,
-                "full_name": full_name,
-                "password_hash": None,  # OAuth users don't have password
-                "avatar_url": avatar_url,
-                "avatar_public_id": None,
-                "oauth_provider": "google",
-                "oauth_id": google_id,
-                "total_jobs": 0,
-                "active_jobs": 0,
-                "plan": "free",
-                "credits_used": 0,
-                "credits_limit": 100,
-                "job_ids": [],
-                "is_active": True,
-                "is_verified": True,  # Google users are auto-verified
-                "created_at": datetime.utcnow(),
-                "updated_at": datetime.utcnow()
-            }
-            
-            user_id = await mongo_client.create_user(user_doc)
-        
-        # Create JWT token
-        user_email = user.get("email") if user else email
-        jwt_token = create_jwt(user_id, user_email)
-        
-        # Redirect to frontend with token
-        frontend_url = f"{settings.frontend_url}/auth/callback?token={jwt_token}"
-        return RedirectResponse(url=frontend_url)
-        
-    except Exception as e:
-        # Redirect to frontend with error
-        frontend_url = f"{settings.frontend_url}/login?error=oauth_failed"
-        return RedirectResponse(url=frontend_url)

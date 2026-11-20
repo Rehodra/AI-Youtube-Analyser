@@ -2,8 +2,9 @@ from pydantic_settings import BaseSettings
 import os
 
 class Settings(BaseSettings):
-    youtube_api_key: str = os.getenv("YOUTUBE_API_KEY")
-    gemini_api_key: str = os.getenv("GEMINI_API_KEY")
+    youtube_api_key: str = os.getenv("YOUTUBE_API_KEY", "")
+    gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
+    groq_api_key: str = os.getenv("GROQ_API_KEY", "")
     mongodb_uri: str = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
     database_name: str = "yt_recommender"
     
@@ -17,12 +18,7 @@ class Settings(BaseSettings):
     cloudinary_api_key: str = os.getenv("CLOUDINARY_API_KEY", "")
     cloudinary_api_secret: str = os.getenv("CLOUDINARY_API_SECRET", "")
     
-    # Google OAuth
-    google_client_id: str = os.getenv("GOOGLE_CLIENT_ID", "")
-    google_client_secret: str = os.getenv("GOOGLE_CLIENT_SECRET", "")
-    google_redirect_uri: str = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/auth/google/callback")
-
-    #Email
+    # Email
     email: str = os.getenv("EMAIL", "")
     password: str = os.getenv("PASSWORD", "")
     
